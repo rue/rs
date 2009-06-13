@@ -34,10 +34,10 @@ class OutputMatcher
 
     # Match up
     case @expected
-      when Regexp
-        @data.should =~ @expected
-      else
-        @data.should == @expected
+    when Regexp
+      @data.should =~ @expected
+    else
+      @data.should == @expected
     end
 
   # Clean up

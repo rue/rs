@@ -76,9 +76,11 @@ module RS
       execute "def rs(); @rs; end"
     end
 
+
     # Allow accessing main from the outside.
     #
     attr_reader :main
+
 
     # Execute a presumably valid String of Ruby code.
     #
@@ -99,9 +101,10 @@ module RS
       e
     end
 
+
     # Yields this instance to block.
     #
-    # RS.start should be used instead.
+    # Use RS.start.
     #
     def run()
       yield self
