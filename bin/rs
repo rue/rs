@@ -46,23 +46,16 @@ require "rs/string"
 require "rs/ui"
 
 
-def time()
-  Time.now.strftime "%H:%M:%S"
-end
-
-def shortpath()
-  Dir.pwd.sub /^#{Regexp.escape ENV["HOME"]}/, "~"
-end
-
-# Little configs.
-#
-default_prompt      = lambda { "#{time} #{shortpath} rs> " }
-continuation_prompt = lambda { "#{time} #{shortpath} ..> " }
-
-
 # TODO: Yeah...ugh. --rue
 #
 RS.start {|rs|
+
+  # Minor configulabulous
+  config = rs.main.send(:rs).config
+
+  config.default_prompt      = lambda { "#{Dir.pwd} rs> " }
+  config.continuation_prompt = lambda { "#{Dir.pwd} ..> " }
+
 
   RS::UI.new {|ui|
 
@@ -88,15 +81,15 @@ RS.start {|rs|
         end
 
         ui.puts "=> #{output.inspect}"
-        ui.prompt = default_prompt
+        ui.prompt = config.default_prompt
 
       else
         @earlier = line + "\n"    # Only allow where newlines should be.
-        ui.prompt = continuation_prompt
+        ui.prompt = config.continuation_prompt
       end
     }
 
-    ui.prompt = default_prompt
+    ui.prompt = config.default_prompt
     ui.run
   }
 
