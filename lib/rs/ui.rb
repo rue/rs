@@ -1,8 +1,5 @@
-# == Authors
-# Please see doc/AUTHORS.
-#
 # == Copyright
-# Copyright (c) 2005-2009 the Authors, all rights reserved.
+# Copyright (c) 2005-2009 Eero Saynatkari, all rights reserved.
 #
 # == Licence
 # Redistribution and use in source and binary forms, with or without
