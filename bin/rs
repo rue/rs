@@ -1,0 +1,107 @@
+#!/usr/bin/env ruby
+#
+# The 'executable' rs program.
+#
+# == Authors
+# Please see doc/AUTHORS.
+#
+# == Copyright
+# Copyright (c) 2005 the Authors, all rights reserved.
+#
+# == Licence
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+# - Redistributions of source code must retain the above copyright
+#   notice, this list of conditions, the following disclaimer and
+#   attribution to the original authors.
+#
+# - Redistributions in binary form must reproduce the above copyright
+#   notice, this list of conditions, the following disclaimer and
+#   attribution to the original authors in the documentation and/or
+#   other materials provided with the distribution.
+#
+# - The names of the authors may not be used to endorse or promote
+#   products derived from this software without specific prior
+#   written permission.
+#
+# == Disclaimer
+# This software is provided "as is" and without any express or
+# implied warranties, including, without limitation, the implied
+# warranties of merchantability and fitness for a particular purpose.
+# Authors are not responsible for any damages, direct or indirect.
+
+# Must be run standalone.
+#
+exit 1 unless __FILE__ == $0
+
+
+# We might need the files in development
+$LOAD_PATH.unshift File.join(File.dirname(__FILE__), "..", "lib")
+
+
+# System
+
+# Project
+require "rs/eval"
+require "rs/string"
+require "rs/ui"
+
+
+def time()
+  Time.now.strftime "%H:%M:%S"
+end
+
+def shortpath()
+  Dir.pwd.sub /^#{Regexp.escape ENV["HOME"]}/, "~"
+end
+
+# Little configs.
+#
+default_prompt      = lambda { "#{time} #{shortpath} rs> " }
+continuation_prompt = lambda { "#{time} #{shortpath} ..> " }
+
+
+# TODO: Yeah...ugh. --rue
+#
+RS.start {|rs|
+
+  RS::UI.new {|ui|
+
+    ui.on_SIGINT {
+      @earlier = nil
+      ui.output ""
+      ui.prompt = default_prompt
+    }
+
+    ui.on_input {|line|
+      next if line.empty?
+
+      line = @earlier + line if @earlier
+
+      if line.complete_expression?
+        @earlier = nil
+
+        # next and redo are unstoppable! --rue
+        begin
+          output = rs.execute line
+        rescue LocalJumpError => e
+          output = e
+        end
+
+        ui.puts "=> #{output.inspect}"
+        ui.prompt = default_prompt
+
+      else
+        @earlier = line + "\n"    # Only allow where newlines should be.
+        ui.prompt = continuation_prompt
+      end
+    }
+
+    ui.prompt = default_prompt
+    ui.run
+  }
+
+}
+
