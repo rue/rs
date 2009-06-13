@@ -25,6 +25,9 @@
 # warranties of merchantability and fitness for a particular purpose.
 # Authors are not responsible for any damages, direct or indirect.
 
+# Libs
+require "ostruct"
+
 
 module RS
 
@@ -62,7 +65,18 @@ module RS
       @binding = eval "lambda { binding }.call", TOPLEVEL_BINDING
 
       execute "def self.inspect(); :yay_rs_toplevel; end"
+      execute "def rs(); @rs; end"
+
+      stash = OpenStruct.new  :evaluator => self,
+                              :config => OpenStruct.new
+
+      @main = execute "self"
+      @main.instance_variable_set "@rs", stash
     end
+
+    # Allow accessing main from the outside.
+    #
+    attr_reader :main
 
     # Execute a presumably valid String of Ruby code.
     #
