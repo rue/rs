@@ -1,10 +1,10 @@
 $LOAD_PATH.unshift File.dirname(__FILE__)
 
 # Testing
-require 'spec_helper'
+require "spec_helper"
 
 # Project
-require 'rs/eval'
+require "rs/eval"
 
 
 # TODO: Dunno how much point there is to add stuff to spec
@@ -25,6 +25,14 @@ describe "Executing Ruby code with the evaluator" do
 
   it "has a top-level self object" do
     @rs.execute("self").should be_kind_of(Object)
+  end
+
+  it "provides #rs which gives access to an OpenStruct" do
+    @rs.execute("rs").should be_kind_of(OpenStruct)
+  end
+
+  it "allows access to a #config OpenStruct through #rs" do
+    @rs.execute("rs.config").should be_kind_of(OpenStruct)
   end
 
   it "allows top-level method definitions" do
