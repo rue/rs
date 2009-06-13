@@ -107,4 +107,8 @@ describe "Evaluator creation using RS.start" do
     lambda { RS.start {|rs| raise "hi" } }.should raise_error("hi")
   end
 
+  it "gives access to the eval context's main object with #main" do
+    RS.start {|rs| rs.main.should be_eql(rs.execute "self") }
+  end
+
 end
