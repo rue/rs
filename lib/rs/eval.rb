@@ -64,14 +64,16 @@ module RS
     def initialize()
       @binding = eval "lambda { binding }.call", TOPLEVEL_BINDING
 
-      execute "def self.inspect(); :yay_rs_toplevel; end"
-      execute "def rs(); @rs; end"
-
       stash = OpenStruct.new  :evaluator => self,
                               :config => OpenStruct.new
 
       @main = execute "self"
       @main.instance_variable_set "@rs", stash
+
+      # Work around MRI changing description.
+      def @main.inspect(); :rs_main; end
+
+      execute "def rs(); @rs; end"
     end
 
     # Allow accessing main from the outside.
