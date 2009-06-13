@@ -1,0 +1,7 @@
+config.rb
+*.log
+*.swp
+.DS_Store
+
+# ctags
+tags
