@@ -68,8 +68,8 @@ RS.start {|rs|
 
     ui.on_SIGINT {
       @earlier = nil
-      ui.output ""
-      ui.prompt = default_prompt
+      ui.puts ""
+      ui.prompt = config.default_prompt
     }
 
     ui.on_input {|line|
