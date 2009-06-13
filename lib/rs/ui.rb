@@ -100,6 +100,7 @@ module RS
           if input = Readline.readline(@prompt.call, true)
             @input.call input.chomp
           else
+            puts ""
             return
           end
         rescue Interrupt
