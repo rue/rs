@@ -105,7 +105,7 @@ module RS
       when /(parse|syntax) error.*?\$end/i, /unterminated/i  # Should catch most
         raise IncompleteExpression
       else
-        raise
+        e
       end
     rescue SystemExit
       raise
