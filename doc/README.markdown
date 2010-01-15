@@ -57,6 +57,6 @@ Copyright (c) 2005-2010 Eero Saynatkari. See doc/LICENCE.
 The original spark was provided by Reyn Vlietstra's ruSH back in 2005.
 It was an excellent implementation of a novel concept, and I thoroughly
 enjoyed working on it. The first incarnation of rs was a complete rewrite
-effort of ruSH, and now I am starting over again. Thanks to Reyn and all
-the other collaborators on ruSH and the earlier rs.
+effort of ruSH, and now I am starting from scratch again. Thanks to Reyn
+and all the other collaborators on ruSH and the earlier rs.
 
