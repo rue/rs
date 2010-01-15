@@ -29,35 +29,11 @@
 # Authors are not responsible for any damages, direct or indirect.
 
 
-# Externals
-require "rubygems"
-  require "ruby_parser"
-
 
 # Extensions to String needed for rs.
 #
 class String
 
-  # Treat String as Ruby code, and attempt to parse it.
-  #
-  # Importantly, only errors that look to be due to an unterminated
-  # expression, be it class body, String literal or an Array, are
-  # combed for among all possible errors. Even though a syntax (or
-  # other) error occurs, the expression may be considered to be
-  # "complete" for purposes of attempting to execute it.
-  #
-  # TODO: Untested, since it is a bit hard to do reasonably. --rue
-  # TODO: This probably deserves a fix in RubyParser/Racc. --rue
-  #
-  def complete_expression?()
-    RubyParser.new.parse self
-  rescue Racc::ParseError, SyntaxError => e
-    case e.message
-    when /parse error.*?\$end/i, /unterminated/i
-      false
-    else
-      true
-    end
-  end
+  # Nothing yet, but will need this later anyway.. --rue
 
 end
