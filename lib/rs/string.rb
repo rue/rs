@@ -53,7 +53,7 @@ class String
     RubyParser.new.parse self
   rescue Racc::ParseError, SyntaxError => e
     case e.message
-    when /parse error.*?\$end/i, /unterminated string/i
+    when /parse error.*?\$end/i, /unterminated/i
       false
     else
       true
