@@ -42,7 +42,6 @@ $LOAD_PATH.unshift File.join(File.dirname(__FILE__), "..", "lib")
 
 # Project
 require "rs/eval"
-require "rs/string"
 require "rs/ui"
 
 
@@ -60,7 +59,7 @@ RS.start {|rs|
   RS::UI.new {|ui|
 
     ui.on_SIGINT {
-      @earlier = nil
+      @earlier_incomplete = nil
       ui.puts ""
       ui.prompt = config.default_prompt
     }
@@ -68,24 +67,23 @@ RS.start {|rs|
     ui.on_input {|line|
       next if line.empty?
 
-      line = @earlier + line if @earlier
+      if @earlier_incomplete
+        line = @earlier_incomplete + line
+        @earlier_incomplete = nil
+      end
 
-      if line.complete_expression?
-        @earlier = nil
-
-        # next and redo are unstoppable! --rue
-        begin
-          output = rs.execute line
-        rescue LocalJumpError => e
-          output = e
-        end
+      begin
+        output = rs.execute line
 
         ui.puts "=> #{output.inspect}"
         ui.prompt = config.default_prompt
 
-      else
-        @earlier = line + "\n"    # Only allow where newlines should be.
+      rescue RS::IncompleteExpression
+        @earlier_incomplete = line + "\n"      # Only allow where newlines appropriate.
         ui.prompt = config.continuation_prompt
+
+      rescue LocalJumpError => e    # next and redo
+        output = e
       end
     }
 

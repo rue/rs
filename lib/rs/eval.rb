@@ -51,6 +51,12 @@ module RS
   end
 
 
+  #
+  # Error raised trying to execute an incomplete expression.
+  #
+  class IncompleteExpression < SyntaxError; end
+
+
   # Runtime environment for executing user input as Ruby.
   #
   class Evaluator
@@ -84,17 +90,23 @@ module RS
 
     # Execute a presumably valid String of Ruby code.
     #
+    # Trying to execute an incomplete Ruby expression
+    # raises IncompleteExpression.
+    #
     # Errors are caught etc. (except top-level next and redo
     # LocalJumpErrors, those need to be caught outside this
     # scope), and returned as objects.
     #
-    # TODO: Maybe implement the various processing needed by
-    #       return values through events/callbacks, too? Here
-    #       or back in the bin. --rue
-    #
     def execute(expression, file = "<no file>", line = "<no line>")
       eval expression, @binding
 
+    rescue SyntaxError => e
+      case e.message
+      when /(parse|syntax) error.*?\$end/i, /unterminated/i  # Should catch most
+        raise IncompleteExpression
+      else
+        raise
+      end
     rescue SystemExit
       raise
     rescue Exception => e
