@@ -14,7 +14,7 @@ describe "UI creation" do
   end
 
   it "provides some kind of a default prompt String" do
-    mock(Readline).readline(satisfy {|arg| arg.kind_of? String }, true).times(1) { nil }
+    Readline.should_receive(:readline).with(an_instance_of(String), true).once.and_return nil
 
     RS::UI.new {|ui| ui.run }
   end
@@ -43,7 +43,7 @@ end
 describe "UI loop/processing" do
 
   it "terminates when ^D, EOF, received." do
-    mock(Readline).readline(anything, anything).times(1) { nil }
+    Readline.should_receive(:readline).once.and_return nil
 
     RS::UI.new {|ui|
       ui.run
@@ -52,13 +52,16 @@ describe "UI loop/processing" do
 
   it "calls the current prompt and uses its value going out for each loop" do
     str = "rs_ui_spec_prompt #{$$}> "
-    mock(prompt = Object.new).call.times(2) { str }
+
+    prompt = Object.new
+    prompt.should_receive(:call).exactly(2).times.and_return { str }
 
     inputs = ["hi\n", "ho\n", nil]
     prompts = [//, str, str]
 
-    mock(Readline).readline(anything, anything).times(3) {|pmpt, i|
-      prompts.shift.should === pmpt
+    # TODO: Slightly iffy, improve.
+    Readline.should_receive(:readline).exactly(3).times {|output_prompt, _|
+      prompts.shift.should === output_prompt
       inputs.shift
     }
 
@@ -79,7 +82,7 @@ describe "UI event handling" do
   it "calls block given to #on_SIGINT on ^C" do
     inputs = [lambda { raise Interrupt }, lambda { nil }]
 
-    stub(Readline).readline(anything, anything).times(2) { inputs.shift.call }
+    Readline.should_receive(:readline).exactly(2).times.and_return { inputs.shift.call }
 
     called = false
 
@@ -96,7 +99,7 @@ describe "UI event handling" do
 
     inputs = [lambda { raise Interrupt }, lambda { continued = true; nil } ]
 
-    stub(Readline).readline(anything, anything).times(2) { inputs.shift.call }
+    Readline.should_receive(:readline).exactly(2).times.and_return { inputs.shift.call }
 
     RS::UI.new {|ui|
       ui.on_SIGINT { :yay }
@@ -110,7 +113,7 @@ describe "UI event handling" do
     inputs = ["hi\n", "ha\n", "hoo bee\n", nil, "blee\n"]
     expected = inputs.map {|i| i.chomp if i }
 
-    stub(Readline).readline(anything, anything).times(4) { inputs.shift }
+    Readline.should_receive(:readline).exactly(4).times.and_return { inputs.shift }
 
     RS::UI.new {|ui|
       ui.on_input {|input|
