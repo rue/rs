@@ -84,13 +84,13 @@ describe "Executing Ruby code with the evaluator" do
     @rs.execute("break").should be_kind_of(Exception)
   end
 
-  # TODO: Known to fail, same as redo. Fix? --rue
   it "returns error object given top-level next" do
+    pending "Escapes on 1.8" if RUBY_VERSION =~ /1\.8/
     @rs.execute("next").should be_kind_of(Exception)
   end
 
-  # TODO: Known to fail, same as next. Fix? --rue
   it "returns error object given top-level redo" do
+    pending "Escapes on 1.8" if RUBY_VERSION =~ /1\.8/
     @rs.execute("redo").should be_kind_of(Exception)
   end
 
