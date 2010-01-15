@@ -40,7 +40,7 @@ Source is found on [Github](http://github.com/rue/rs).
 =======================
 
 * rs MEOW projects _purr_ kittensoft _rawr_ org.
-* IRC channels #rs and ##rs on Freenode ('rue', if not the only person.)
+* IRC channel ##rs on Freenode ('rue', if not the only person.)
 
 
 
