@@ -2,11 +2,6 @@ $LOAD_PATH.unshift File.join(File.dirname(__FILE__), "..", "lib")
 
 require "tempfile"
 
-require "rubygems"
-  require "micronaut"
-
-Micronaut.configure {|config| config.mock_with :rr }
-
 
 class OutputMatcher
   def initialize(expected, stream)
