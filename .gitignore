@@ -3,5 +3,7 @@ config.rb
 *.swp
 .DS_Store
 
+old
+
 # ctags
 tags
