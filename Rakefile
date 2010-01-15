@@ -6,7 +6,7 @@ begin
     Jeweler::Tasks.new do |gem|
       gem.name        = "rs"
 
-      gem.version     = `git log --pretty=oneline | wc -l`.chomp
+      gem.version     = `git log --pretty=oneline | wc -l`.strip
 
 
       gem.summary     = "Object-oriented shell in full Ruby environment."
