@@ -1,4 +1,9 @@
 config.rb
+InstalledFiles
+
+rs.gemspec
+pkg/
+
 *.log
 *.swp
 .DS_Store
