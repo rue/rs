@@ -82,7 +82,7 @@ RS.start {|rs|
         @earlier_incomplete = line + "\n"      # Only allow where newlines appropriate.
         ui.prompt = config.continuation_prompt
 
-      rescue LocalJumpError => e    # next and redo
+      rescue LocalJumpError => e    # next and redo in 1.8
         output = e
       end
     }

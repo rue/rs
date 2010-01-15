@@ -77,21 +77,21 @@ describe "Executing Ruby code with the evaluator" do
   end
 
   it "returns error object given top-level return" do
-    @rs.execute("return").should be_kind_of(LocalJumpError)
+    @rs.execute("return").should be_kind_of(Exception)
   end
 
   it "returns error object given top-level break" do
-    @rs.execute("break").should be_kind_of(LocalJumpError)
+    @rs.execute("break").should be_kind_of(Exception)
   end
 
   # TODO: Known to fail, same as redo. Fix? --rue
   it "returns error object given top-level next" do
-    @rs.execute("next").should be_kind_of(LocalJumpError)
+    @rs.execute("next").should be_kind_of(Exception)
   end
 
   # TODO: Known to fail, same as next. Fix? --rue
   it "returns error object given top-level redo" do
-    @rs.execute("redo").should be_kind_of(LocalJumpError)
+    @rs.execute("redo").should be_kind_of(Exception)
   end
 
 end
