@@ -12,40 +12,87 @@ module RS
   class FileSystemObject
 
     #
-    # New FSO for given path.
+    # New FSO to represent given path.
     #
-    def initialize(path_string)
-      @original = path_string
+    def initialize(given_path, absolute_path)
+      @given_path, @absolute_path = given_path, absolute_path
+    end
 
-      @absolute = if qualified?
-                    File.expand_path path_string
+    # Given path is the one user gave, absolute computed.
+    attr_reader :given_path, :absolute_path
+
+  end   # FileSystemObject
+
+
+  #
+  # Normal file.
+  #
+  class RegularFile < FileSystemObject
+
+    #
+    # New object representing (an existing) plain file.
+    #
+    def initialize(given_path, absolute_path)
+      super
+    end
+
+  end
+
+
+  #
+  # Abstractions supposedly necessary over the filesystem.
+  #
+  module FileSystem
+
+    #
+    # Create an object of the appropriate type for the path.
+    #
+    # Nonexistent paths start their lives as plain FSOs.
+    #
+    def self.object_for(given)
+      absolute  = if qualified? given
+                    File.expand_path given
                   else
-                    find_in_PATH
+                    find_in_PATH given
                   end
+
+      # Does not exist (yet)
+      return FileSystemObject.new given, absolute unless File.exist? absolute
+
+      case File.stat(absolute).ftype
+      when "file"
+        RegularFile.new given, absolute
+      else
+        FileSystemObject.new given, absolute
+      end
     end
 
 
   private
 
-    def find_in_PATH()
-      dir = ENV["PATH"].split(":").find {|path|
-              # TODO: Uses EUID, bad?
-              File.executable? File.join(path, @original)
-            }
+    #
+    # Locate executable file name in one of the PATH directories.
+    #
+    def self.find_in_PATH(filename)
+      # TODO: Own env
+      ENV["PATH"].split(":").each {|path|
+        candidate = File.join path, filename
 
-      raise ArgumentError, "'#{@original}' is not an executable file in PATH!" unless dir
+        # TODO: Uses EUID, bad?
+        return candidate if File.executable? candidate
+      }
 
-      File.join dir, @original
+      raise ArgumentError, "'#{@original}' is not an executable file in PATH!"
     end
 
     #
     # A qualified path starts with a ., .., / or ~
     #
-    def qualified?()
-      @original =~ %r[\A(\.{1,2}|/|~)]
+    def self.qualified?(path)
+      path =~ /\A(\.{1,2}|\/|~)/
     end
 
-  end
+  end   # FileSystem
 
 end
 
@@ -57,7 +104,7 @@ class ::String
   # Create new FileSystemObject using self as argument.
   #
   def to_fso()
-    RS::FileSystemObject.new self
+    RS::FileSystem.object_for self
   end
 
 end
