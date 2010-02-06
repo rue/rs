@@ -40,8 +40,10 @@ describe "Creating FSOs with a qualified path string (., .., /, ~)" do
     @existing, @nonexistent = File.join(@sandbox, "somefile"),
                               File.join(@sandbox, "nonesuch")
 
-    @homefile = `ls ~ | tail -1`.strip
-    @nohomefile = @homefile.succ! while File.exist? File.expand_path("~/#{@homefile}")
+    @homefile = File.join "~", `ls ~ | tail -1`.strip
+
+    @nohomefile = @homefile.succ
+    @nohomefile = @nohomefile.succ! while File.exist? @nohomefile
 
     Dir.chdir @sandbox
   end
