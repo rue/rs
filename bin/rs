@@ -45,7 +45,7 @@ require "rs/ui"
 #
 RS.start {|rs|
 
-  # Minor configulabulous
+  # Minor configs
   config = rs.main.send(:rs).config
 
   config.default_prompt      = lambda { "#{Dir.pwd} rs> " }
@@ -85,7 +85,7 @@ RS.start {|rs|
 
     ui.prompt = config.default_prompt
     ui.run
-  }
 
+  }
 }
 
