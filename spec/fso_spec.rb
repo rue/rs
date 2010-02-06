@@ -19,13 +19,13 @@ def setup_dummy_dir()
 end
 
 
-FSO = RS::FileSystemObject
+FS = RS::FileSystem
 
 
 describe "String#to_fso" do
 
-  it "calls FileSystemObject.new with itself as the single argument" do
-    RS::FileSystemObject.should_receive(:new).with __FILE__
+  it "calls FileSystem.object_for with itself as the single argument" do
+    RS::FileSystem.should_receive(:object_for).with __FILE__
 
     __FILE__.to_fso
   end
@@ -54,39 +54,39 @@ describe "Creating FSOs with a qualified path string (., .., /, ~)" do
   end
 
   it "returns an FSO given an absolute path to an existing file" do
-    FSO.new(@existing).should be_kind_of(RS::FileSystemObject)
+    FS.object_for(@existing).should be_kind_of(RS::FileSystemObject)
   end
 
   it "returns an FSO given a . relative path to an existing file" do
-    FSO.new("./#{File.basename @existing}").should be_kind_of(RS::FileSystemObject)  
+    FS.object_for("./#{File.basename @existing}").should be_kind_of(RS::FileSystemObject)  
   end
 
   it "returns an FSO given a .. relative path to an existing file" do
     Dir.chdir("subdirectory") {
-      FSO.new("../#{File.basename @existing}").should be_kind_of(RS::FileSystemObject)  
+      FS.object_for("../#{File.basename @existing}").should be_kind_of(RS::FileSystemObject)  
     }
   end
 
   it "returns an FSO given a ~ relative path to an existing file" do
-    FSO.new(@homefile).should be_kind_of(RS::FileSystemObject)
+    FS.object_for(@homefile).should be_kind_of(RS::FileSystemObject)
   end
 
   it "returns an FSO given an absolute path to a nonexistent file" do
-    FSO.new(@nonexistent).should be_kind_of(RS::FileSystemObject)
+    FS.object_for(@nonexistent).should be_kind_of(RS::FileSystemObject)
   end
 
   it "returns an FSO given a . relative path to a nonexistent file" do
-    FSO.new("./#{File.basename @nonexistent}").should be_kind_of(RS::FileSystemObject)  
+    FS.object_for("./#{File.basename @nonexistent}").should be_kind_of(RS::FileSystemObject)  
   end
 
   it "returns an FSO given a .. relative path to a nonexistent file" do
     Dir.chdir("subdirectory") {
-      FSO.new("../#{File.basename @nonexistent}").should be_kind_of(RS::FileSystemObject)  
+      FS.object_for("../#{File.basename @nonexistent}").should be_kind_of(RS::FileSystemObject)  
     }
   end
 
   it "returns an FSO given a ~ relative path to a nonexistent file" do
-    FSO.new(@nohomefile).should be_kind_of(RS::FileSystemObject)
+    FS.object_for(@nohomefile).should be_kind_of(RS::FileSystemObject)
   end
 
 end
@@ -110,20 +110,20 @@ describe "Creating an FSO with a path string that is not qualified by ., .., / o
   end
 
   it "raises an error when path string does not correspond to a file name in one of the PATH directories" do
-    lambda { FSO.new @nonesuch }.should raise_error
+    lambda { FS.object_for @nonesuch }.should raise_error
   end
 
   it "raises an error when path string corresponds to a nonexecutable file name in one of the PATH directories" do
     FileUtils.touch File.join(@sandbox, @nonesuch)
 
-    lambda { FSO.new @nonesuch }.should raise_error
+    lambda { FS.object_for @nonesuch }.should raise_error
   end
 
   it "returns an FSO given a path string that is an executable file in one of the PATH directories" do
     FileUtils.touch File.join(@sandbox, @nonesuch)
     FileUtils.chmod 0755, File.join(@sandbox, @nonesuch)
 
-    FSO.new(@nonesuch).should be_kind_of(RS::FileSystemObject)
+    FS.object_for(@nonesuch).should be_kind_of(RS::FileSystemObject)
   end
 
 end
