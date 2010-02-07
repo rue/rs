@@ -184,10 +184,12 @@ describe "An FSO created with a particular path string" do
   end
 
   # TODO: Add sanity check for other file types
-  it "stores the string given at creation as #path_given whether relative, absolute or unqualified" do
-    FS.object_for(@relative).path_given.should == @relative
-    FS.object_for(@absolute).path_given.should == @absolute
-    FS.object_for(@unqualified).path_given.should == @unqualified
+  it "stores the string given at creation as #path/#path_given whether relative, absolute or unqualified" do
+    %w[path path_given].all? {|cmd|
+      FS.object_for(@relative).send(cmd).should == @relative
+      FS.object_for(@absolute).send(cmd).should == @absolute
+      FS.object_for(@unqualified).send(cmd).should == @unqualified
+    }.should be_true
   end
 
   it "stores the absolute path resolved from given at creation as #path_absolute" do
