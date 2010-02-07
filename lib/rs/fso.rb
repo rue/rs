@@ -90,8 +90,15 @@ module RS
       # Given path is the one user gave, absolute computed.
       attr_reader :path_given, :path_absolute
 
-      # For the lazy among us
+      # Usual but imprecise term aliased for convenience.
       alias_method :path, :path_given
+
+      # "Conversion" by just producing the path - the *given* path, not expanded.
+      alias_method :to_str, :path_given
+
+      # "Conversion" by just producing the path - the *given* path, not expanded.
+      alias_method :to_path, :path_given
+
 
     end   # FileSystemObject
 
@@ -127,7 +134,7 @@ module RS
 
 
     #
-    # Executables filesystem object.
+    # Executable filesystem object.
     #
     class Executable < RegularFile
 
