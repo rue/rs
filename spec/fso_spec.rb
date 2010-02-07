@@ -174,11 +174,31 @@ end
 
 describe "An FSO created with a particular path string" do
 
-  it "stores the string given at creation as #path_given" do
-    
+  before :each do
+    @relative = File.join ".", File.basename(__FILE__)
+    @absolute = File.expand_path __FILE__
+    @unqualified = %w[wc grep ls cd echo].find {|cmd| system "which #{cmd} >/dev/null" }
+  end
+
+  after :each do
+  end
+
+  # TODO: Add sanity check for other file types
+  it "stores the string given at creation as #path_given whether relative, absolute or unqualified" do
+    FS.object_for(@relative).path_given.should == @relative
+    FS.object_for(@absolute).path_given.should == @absolute
+    FS.object_for(@unqualified).path_given.should == @unqualified
   end
 
   it "stores the absolute path resolved from given at creation as #path_absolute" do
+    FS.object_for(@relative).path_absolute.should == File.expand_path(@relative)
+    FS.object_for(@absolute).path_absolute.should == @absolute
+    FS.object_for(@unqualified).path_absolute.should == `which #{@unqualified}`.strip
   end
 
+end
+
+
+describe "An FSO with a nonexistent path" do
+  it "Says no to exists? or whatever"
 end
