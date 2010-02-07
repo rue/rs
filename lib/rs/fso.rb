@@ -90,6 +90,9 @@ module RS
       # Given path is the one user gave, absolute computed.
       attr_reader :path_given, :path_absolute
 
+      # For the lazy among us
+      alias_method :path, :path_given
+
     end   # FileSystemObject
 
 
@@ -141,6 +144,7 @@ module RS
   end   # FileSystem
 
 end
+
 
 # Need to patch String a little bit.
 
