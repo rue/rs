@@ -9,13 +9,35 @@ require "rs/fso"
 
 
 # Create a place for us to play in
+#
+# dir/
+#     somefile
+#     some_executable
+#     <nonexistent>
+#     not_in_PATH
+#     subdirectory/
+#
 def setup_dummy_dir()
-  dir = File.join Dir.tmpdir, "rs_sandbox_#{$$}_#{Time.now.to_f}"
+  dir             = File.join Dir.tmpdir, "rs_sandbox_#{$$}_#{Time.now.to_f}"
+  subdir          = File.join dir, "subdirectory"
+  somefile        = File.join dir, "somefile"
+  some_executable = File.join dir, "some_executable"
+  nonexistent     = File.join dir, "nonesuch"
 
-  FileUtils.mkdir_p File.join(dir, "subdirectory")
-  FileUtils.touch File.join(dir, "somefile")
+  FileUtils.mkdir_p subdir
+  FileUtils.touch somefile
 
-  dir
+  FileUtils.touch some_executable
+  FileUtils.chmod 0755, some_executable
+
+  not_in_PATH = "rs_no_such_file_in_PATH_aaa"
+  not_in_PATH.succ! while system "which #{not_in_PATH} >/dev/null"
+
+  FileUtils.touch File.join(dir, not_in_PATH)
+  FileUtils.chmod 0755, File.join(dir, not_in_PATH)
+
+
+  [dir, somefile, some_executable, nonexistent, not_in_PATH, subdir]
 end
 
 
@@ -35,22 +57,20 @@ end
 describe "Creating FSOs with a qualified path string (., .., /, ~)" do
 
   before :each do
-    @sandbox, @here = setup_dummy_dir, Dir.pwd
-
-    @existing, @nonexistent = File.join(@sandbox, "somefile"),
-                              File.join(@sandbox, "nonesuch")
+    @dir, @existing, @executable, @nonexistent, @not_in_PATH, @subdir = setup_dummy_dir
 
     @homefile = File.join "~", `ls ~ | tail -1`.strip
 
     @nohomefile = @homefile + "_rs_aaa"
     @nohomefile = @nohomefile.succ! while File.exist? @nohomefile
 
-    Dir.chdir @sandbox
+    @here = Dir.pwd
+    Dir.chdir @dir
   end
 
   after :each do
     Dir.chdir @here
-    FileUtils.rm_r @sandbox, :secure => true
+    FileUtils.rm_r @dir, :secure => true
   end
 
   it "returns an FSO given an absolute path to an existing file" do
@@ -100,7 +120,7 @@ describe "Creating FSOs with a qualified path string (., .., /, ~)" do
   end
 
   it "returns a Directory for existing directories." do
-    FS.object_for(@sandbox).should be_instance_of(FS::Directory)
+    FS.object_for(@dir).should be_instance_of(FS::Directory)
   end
 
   it "returns a Socket/FIFO/Blockdevice/etc. for corresponding existing files"
@@ -115,43 +135,50 @@ end
 describe "Creating an FSO with a path string that is not qualified by ., .., / or ~" do
 
   before :each do
-    @sandbox = setup_dummy_dir
+    @dir, @existing, @executable, @nonexistent, @not_in_PATH, @subdir = setup_dummy_dir
 
-    @nonesuch = "rs_no_such_file_in_PATH_#{$$}_#{Time.now.to_f}_aa"
-    @nonesuch.succ! while system "which #{@nonesuch} >/dev/null"
+    @real_PATH, @substitute_PATH = ENV["PATH"], "#{@dir}:#{ENV["PATH"]}"
 
-    @oldpath, ENV["PATH"] = ENV["PATH"], "#{@sandbox}:#{ENV["PATH"]}"
+    # All but one at this point need adjusted PATH, be mindful when working with them.
+    ENV["PATH"] = @substitute_PATH
   end
 
   after :each do
-    ENV["PATH"] = @oldpath
+    ENV["PATH"] = @real_PATH
 
-    FileUtils.rm_r @sandbox, :secure => true
+    FileUtils.rm_r @dir, :secure => true
   end
 
   it "raises an error when path string does not correspond to a file name in one of the PATH directories" do
-    lambda { FS.object_for @nonesuch }.should raise_error
+    ENV["PATH"] = @real_PATH        # Revert our modification
+
+    lambda { FS.object_for @not_in_PATH }.should raise_error
   end
 
   it "raises an error when path string corresponds to a nonexecutable file name in one of the PATH directories" do
-    FileUtils.touch File.join(@sandbox, @nonesuch)
+    FileUtils.chmod 0644, File.join(@dir, @not_in_PATH) # Present but not executable
 
-    lambda { FS.object_for @nonesuch }.should raise_error
+    lambda { FS.object_for @not_in_PATH }.should raise_error
   end
 
   it "returns an FSO given a path string that is an executable file in one of the PATH directories" do
-    FileUtils.touch File.join(@sandbox, @nonesuch)
-    FileUtils.chmod 0755, File.join(@sandbox, @nonesuch)
-
-    FS.object_for(@nonesuch).should be_kind_of(FS::FileSystemObject)
+    FS.object_for(@not_in_PATH).should be_kind_of(FS::FileSystemObject)
   end
 
   it "returns an Executable rather than a plain FSO in fact." do
-    FileUtils.touch File.join(@sandbox, @nonesuch)
-    FileUtils.chmod 0755, File.join(@sandbox, @nonesuch)
-
-    FS.object_for(@nonesuch).should be_instance_of(FS::Executable)
+    FS.object_for(@not_in_PATH).should be_instance_of(FS::Executable)
   end
 
 end
 
+
+describe "An FSO created with a particular path string" do
+
+  it "stores the string given at creation as #path_given" do
+    
+  end
+
+  it "stores the absolute path resolved from given at creation as #path_absolute" do
+  end
+
+end
