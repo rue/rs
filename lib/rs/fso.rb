@@ -83,12 +83,12 @@ module RS
       #
       # New FSO to represent given path.
       #
-      def initialize(given_path, absolute_path)
-        @given_path, @absolute_path = given_path, absolute_path
+      def initialize(path_given, path_absolute)
+        @path_given, @path_absolute = path_given, path_absolute
       end
 
       # Given path is the one user gave, absolute computed.
-      attr_reader :given_path, :absolute_path
+      attr_reader :path_given, :path_absolute
 
     end   # FileSystemObject
 
@@ -101,7 +101,7 @@ module RS
       #
       # New object representing (an existing) directory.
       #
-      def initialize(given_path, absolute_path)
+      def initialize(path_given, path_absolute)
         super
       end
 
@@ -116,7 +116,7 @@ module RS
       #
       # New object representing (an existing) plain file.
       #
-      def initialize(given_path, absolute_path)
+      def initialize(path_given, path_absolute)
         super
       end
 
@@ -131,7 +131,7 @@ module RS
       #
       # New object representing (an existing) executable.
       #
-      def initialize(given_path, absolute_path)
+      def initialize(path_given, path_absolute)
         super
       end
 
