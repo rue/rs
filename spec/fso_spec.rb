@@ -1,4 +1,3 @@
-# Testing
 require File.join(File.dirname(File.expand_path(__FILE__)), "spec_helper")
 
 # Ruby
@@ -184,8 +183,14 @@ describe "An FSO created with a particular path string" do
   end
 
   # TODO: Add sanity check for other file types
-  it "stores the string given at creation as #path/#path_given whether relative, absolute or unqualified" do
-    %w[path path_given].all? {|cmd|
+  it "stores the string given at creation as #path_given whether relative, absolute or unqualified" do
+    FS.object_for(@relative).path_given.should == @relative
+    FS.object_for(@absolute).path_given.should == @absolute
+    FS.object_for(@unqualified).path_given.should == @unqualified
+  end
+
+  it "provides #to_str, #to_path and #path as aliases of #path_given" do
+    %w[to_str to_path path].all? {|cmd|
       FS.object_for(@relative).send(cmd).should == @relative
       FS.object_for(@absolute).send(cmd).should == @absolute
       FS.object_for(@unqualified).send(cmd).should == @unqualified
@@ -200,7 +205,3 @@ describe "An FSO created with a particular path string" do
 
 end
 
-
-describe "An FSO with a nonexistent path" do
-  it "Says no to exists? or whatever"
-end
