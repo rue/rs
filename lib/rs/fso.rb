@@ -1,42 +1,8 @@
-require "fileutils"
 
-
+#
+# Yay, rs.
+#
 module RS
-
-  #
-  # An object in the file system. I.e. a file of some kind.
-  #
-  # Note: executable locations are "bound" at time of creation,
-  #       not when running. These are objects.
-  #
-  class FileSystemObject
-
-    #
-    # New FSO to represent given path.
-    #
-    def initialize(given_path, absolute_path)
-      @given_path, @absolute_path = given_path, absolute_path
-    end
-
-    # Given path is the one user gave, absolute computed.
-    attr_reader :given_path, :absolute_path
-
-  end   # FileSystemObject
-
-
-  #
-  # Normal file.
-  #
-  class RegularFile < FileSystemObject
-
-    #
-    # New object representing (an existing) plain file.
-    #
-    def initialize(given_path, absolute_path)
-      super
-    end
-
-  end
 
 
   #
@@ -48,6 +14,8 @@ module RS
     # Create an object of the appropriate type for the path.
     #
     # Nonexistent paths start their lives as plain FSOs.
+    #
+    # TODO: Allow creating e.g. a nonexisting Directory directly?
     #
     def self.object_for(given)
       absolute  = if qualified? given
@@ -61,7 +29,13 @@ module RS
 
       case File.stat(absolute).ftype
       when "file"
-        RegularFile.new given, absolute
+        if File.executable? absolute
+          Executable.new given, absolute
+        else
+          RegularFile.new given, absolute
+        end
+      when "directory"
+        Directory.new given, absolute
       else
         FileSystemObject.new given, absolute
       end
@@ -91,6 +65,78 @@ module RS
     def self.qualified?(path)
       path =~ /\A(\.{1,2}|\/|~)/
     end
+
+
+  # Nested classes for file system objects
+
+    #
+    # An object in the file system.
+    #
+    # FSO defines what little common behaviour there is between
+    # the different types of files that may exist in a system.
+    #
+    # All nonexistent paths are also just plain FSOs since they
+    # have no type yet.
+    #
+    class FileSystemObject                    # Sure, but rather than worry about ::Object everywhere
+
+      #
+      # New FSO to represent given path.
+      #
+      def initialize(given_path, absolute_path)
+        @given_path, @absolute_path = given_path, absolute_path
+      end
+
+      # Given path is the one user gave, absolute computed.
+      attr_reader :given_path, :absolute_path
+
+    end   # FileSystemObject
+
+
+    #
+    # Directory filesystem object.
+    #
+    class Directory < FileSystemObject
+
+      #
+      # New object representing (an existing) directory.
+      #
+      def initialize(given_path, absolute_path)
+        super
+      end
+
+    end   # Directory
+
+
+    #
+    # Regular filesystem file object.
+    #
+    class RegularFile < FileSystemObject
+
+      #
+      # New object representing (an existing) plain file.
+      #
+      def initialize(given_path, absolute_path)
+        super
+      end
+
+    end   # RegularFile
+
+
+    #
+    # Executables filesystem object.
+    #
+    class Executable < RegularFile
+
+      #
+      # New object representing (an existing) executable.
+      #
+      def initialize(given_path, absolute_path)
+        super
+      end
+
+    end   # Executable
+
 
   end   # FileSystem
 
