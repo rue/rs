@@ -28,6 +28,9 @@
 # Libs
 require "ostruct"
 
+# Project
+require "rs/config"
+
 
 module RS
 
@@ -71,8 +74,9 @@ module RS
       @binding = eval "lambda { binding }.call", TOPLEVEL_BINDING
 
       stash = OpenStruct.new  :evaluator => self,
-                              :config => OpenStruct.new
+                              :config => Config
 
+      # Self from the binding we created above
       @main = execute "self"
       @main.instance_variable_set "@rs", stash
 

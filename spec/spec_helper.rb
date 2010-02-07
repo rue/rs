@@ -3,8 +3,6 @@ $LOAD_PATH.unshift File.join(File.dirname(__FILE__), "..", "lib")
 require "fileutils"
 require "tempfile"
 
-
-
 #
 # Actual output matching.
 #
@@ -14,7 +12,7 @@ class OutputMatcher
     @stream = stream
   end
 
-# TODO: cleanup unnecessary error stuffs
+  # TODO: cleanup unnecessary error stuffs
   def matches?(block)
     old_to = @stream.dup
 

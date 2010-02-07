@@ -99,7 +99,6 @@ module RS
       # "Conversion" by just producing the path - the *given* path, not expanded.
       alias_method :to_path, :path_given
 
-
     end   # FileSystemObject
 
 
