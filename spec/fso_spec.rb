@@ -34,7 +34,7 @@ end
 
 describe "Creating FSOs with a qualified path string (., .., /, ~)" do
 
-  before :all do
+  before :each do
     @sandbox, @here = setup_dummy_dir, Dir.pwd
 
     @existing, @nonexistent = File.join(@sandbox, "somefile"),
@@ -48,7 +48,7 @@ describe "Creating FSOs with a qualified path string (., .., /, ~)" do
     Dir.chdir @sandbox
   end
 
-  after :all do
+  after :each do
     Dir.chdir @here
     FileUtils.rm_r @sandbox, :secure => true
   end
@@ -58,12 +58,12 @@ describe "Creating FSOs with a qualified path string (., .., /, ~)" do
   end
 
   it "returns an FSO given a . relative path to an existing file" do
-    FS.object_for("./#{File.basename @existing}").should be_kind_of(FS::FileSystemObject)  
+    FS.object_for("./#{File.basename @existing}").should be_kind_of(FS::FileSystemObject)
   end
 
   it "returns an FSO given a .. relative path to an existing file" do
     Dir.chdir("subdirectory") {
-      FS.object_for("../#{File.basename @existing}").should be_kind_of(FS::FileSystemObject)  
+      FS.object_for("../#{File.basename @existing}").should be_kind_of(FS::FileSystemObject)
     }
   end
 
@@ -76,17 +76,37 @@ describe "Creating FSOs with a qualified path string (., .., /, ~)" do
   end
 
   it "returns an FSO given a . relative path to a nonexistent file" do
-    FS.object_for("./#{File.basename @nonexistent}").should be_kind_of(FS::FileSystemObject)  
+    FS.object_for("./#{File.basename @nonexistent}").should be_kind_of(FS::FileSystemObject)
   end
 
   it "returns an FSO given a .. relative path to a nonexistent file" do
     Dir.chdir("subdirectory") {
-      FS.object_for("../#{File.basename @nonexistent}").should be_kind_of(FS::FileSystemObject)  
+      FS.object_for("../#{File.basename @nonexistent}").should be_kind_of(FS::FileSystemObject)
     }
   end
 
   it "returns an FSO given a ~ relative path to a nonexistent file" do
     FS.object_for(@nohomefile).should be_kind_of(FS::FileSystemObject)
+  end
+
+  it "returns an Executable for an existing file that is executable." do
+    FileUtils.chmod 0755, @existing
+
+    FS.object_for(@existing).should be_instance_of(FS::Executable)
+  end
+
+  it "returns a RegularFile for existing plain nonexecutable files." do
+    FS.object_for(@existing).should be_instance_of(FS::RegularFile)
+  end
+
+  it "returns a Directory for existing directories." do
+    FS.object_for(@sandbox).should be_instance_of(FS::Directory)
+  end
+
+  it "returns a Socket/FIFO/Blockdevice/etc. for corresponding existing files"
+
+  it "returns an actual FSO instance for all nonexisting paths" do
+    FS.object_for(@nonexistent).should be_instance_of(FS::FileSystemObject)
   end
 
 end
@@ -133,9 +153,5 @@ describe "Creating an FSO with a path string that is not qualified by ., .., / o
     FS.object_for(@nonesuch).should be_instance_of(FS::Executable)
   end
 
-end
-
-
-describe "An FSO created from a qualified file string (., .., /, ~)" do
 end
 
